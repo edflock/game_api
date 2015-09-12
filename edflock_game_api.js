@@ -6,8 +6,11 @@ var GameAPI = function(options){
 };
 
 GameAPI.prototype.alert = function(){
-	alert("Hi");
+	alert("Hello");
 };
+ GameAPI.prototype.event = Object.create(EventEmitter.prototype);
+ GameAPI.prototype.on = GameAPI.prototype.event.addListener;
+ GameAPI.prototype.off = GameAPI.prototype.event.removeListener;
 
 window.EdFlockGameAPI = GameAPI;
 })();
