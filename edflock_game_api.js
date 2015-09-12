@@ -53,7 +53,7 @@
 		*	{
 		*		channel : "",
 		*		topic : '',
-		*		data : {}
+		*		dataFunction: function() {}
 		*	}
 		*
 		* Subscribes to topic = 'topic.request' and publish the data in the form of 'topic.response'
@@ -61,13 +61,14 @@
 		this.subscribeAndReply = function(options) {
 			var channel = options.channel || 'generic',
 				topic = options.topic || '#',
-				data = options.data || {};
+				dataFunction = options.dataFunction || function() {return{}};
 
 			this.transport.subscribe({
 				channel  : channel,
 				topic    : topic + '.request',
 				callback : function() {
-        		    edFlockGameAPITransport.publish({
+					var data = dataFunction();
+        		    edFlockGameWebTransport.publish({
 	                    channel: channel,
 	                    topic: topic + ".response",
 	                    data: data
