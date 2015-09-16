@@ -1,41 +1,78 @@
-//This is the game API that commnucates with the player API. The Game API is used by the game.
-/*
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.24/browser-polyfill.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/postal.js/1.0.7/postal.min.js"></script>
-    <script src="postal.federation.min.js"></script>
-    <script src="postal.request-response.js"></script>
-    <script src="postal.xframe.min.js"></script>
-*/
-(function(window, $, postal) {
-	var GameAPITransport = postal;
-	GameAPITransport.instanceId('gameAPI');
-	
-	// We need to tell postal how to get a deferred instance
-	GameAPITransport.configuration.promise.createDeferred = function() {
-	    return new $.Deferred();
-	};
-	// We need to tell GameAPITransport how to get a "public-facing"/safe promise instance
-	GameAPITransport.configuration.promise.getPromise = function(dfd) {
-	    return dfd.promise();
-	};
-	GameAPITransport.fedx.addFilter([
-	    { channel: 'users',    topic: '#', direction: 'both'  },
-	    { channel: 'iframez',   topic: '#', direction: 'both'  },
-	    { channel: 'points',   topic: '#', direction: 'both' },
-	    { channel: 'status',   topic: '#', direction: 'both' }
+(function(window, $, PubSub) {
+	var edFlockGameAPITransport = function (argument) {
 
-	]);
+		var argument = argument || {},
+			parent = argument.parent || window;
+		
+		if (window.addEventListener) {
+			// For standards-compliant web browsers
+			parent.addEventListener("message", parseMessage, false);
+		}
+		else {
+			parent.attachEvent("onmessage", parseMessage);
+		}
 
-	GameAPITransport.addWireTap(function(d, e) {
-	    console.log("ID: " + GameAPITransport.instanceId() + " - " + JSON.stringify(e, null, 4));
-	});
+		function parseMessage(event) {
+			var messageData = event.data,
+				channel = messageData.channel,
+				topic = messageData.topic,
+				actualData = messageData.data;
+				console.log(event);
 
-	window.edFlockGameAPITransport = GameAPITransport;
-	edFlockGameAPITransport.fedx.signalReady();
+			messageName = channel + "." + topic;
+			console.log('iframe message just recieved = ' + messageName);
+			PubSub.publish(messageName, actualData);
+		}
 
-	window.EdflockGameApi = function() {
+		this.publish = function(options) {
+			var channel = options.channel || 'generic',
+				topic = options.topic || '',
+				data = options.data || "";
+
+			var dataMain = {
+				channel: channel,
+				topic: topic,
+				data: data
+			};
+
+			messageName = channel + "." + topic;
+
+			console.log('iframe publishing event = '+ messageName);
+			PubSub.publish(messageName, data);
+
+			parent.postMessage(dataMain, "*");
+		}
+
+		this.subscribe = function(options) {
+			var channel = options.channel || 'generic',
+				topic = options.topic || '',
+				callback = options.callback || function() {console.log('no call back given')};
+
+			messageName = channel + "." + topic;
+			console.log('iframe subscribing to event = '+ messageName);
+
+			PubSub.subscribe(messageName, callback);
+		}
+
+		this.subscribeOnce = function (options) {
+			var channel = options.channel || 'generic',
+				topic = options.topic || '',
+				callback = options.callback || function() {console.log('no call back given')};
+
+			messageName =  channel + "." + topic;
+			console.log('iframe subscribing to event once = '+ messageName);
+
+			subscribeId = PubSub.subscribe(messageName, callback);
+			PubSub.subscribe(messageName, (function(token) {
+				return function() {
+					PubSub.unsubscribe( token );
+				}
+			})(subscribeId));
+
+		}
+	}
+
+	window.EdflockGameApi = function(options) {
 		/*var users = edFlockGameAPITransport.channel('users'),
 			score = edFlockGameAPITransport.channel('score');
 
@@ -46,8 +83,9 @@
 				timeout: 2000
 			});
 		}*/
+		transport = new edFlockGameAPITransport();
 
-		this.transport = edFlockGameAPITransport;
+		this.transport = transport;
 
 		/* It expect options as 
 		*	{
@@ -65,12 +103,12 @@
 
 			this.transport.subscribe({
 				channel  : channel,
-				topic    : topic + '.request',
+				topic    : topic + '-request',
 				callback : function() {
 					var data = dataFunction();
-        		    edFlockGameWebTransport.publish({
+        		    transport.publish({
 	                    channel: channel,
-	                    topic: topic + ".response",
+	                    topic: topic + "-response",
 	                    data: data
 	                });
 				}
@@ -84,14 +122,14 @@
 
 			this.transport.publish({
                 channel: channel,
-                topic: topic + ".request"
+                topic: topic + "-request"
             });
 
-			this.transport.subscribe({
+			this.transport.subscribeOnce({
 				channel  : channel,
-				topic    : topic + ".response",
+				topic    : topic + "-response",
 				callback : callback
-			}).once();
+			});
 		}
 
 		this.requestForUserName = function(cb) {
@@ -99,9 +137,10 @@
 		}
 
 		this.addPoints = function(data) {
+			console.log('iframe sending');
 			this.transport.publish({
 				channel: 'points',
-				topic: 'points.add',
+				topic: 'points-add',
 				data: data
 			});
 		}
@@ -109,13 +148,13 @@
 		this.changeStatus = function(data) {
 			this.transport.publish({
 				channel: 'status',
-				topic: 'status.change',
+				topic: 'status-change',
 				data: data
 			});
 		}
 
 	}
-}) (window, $, postal)
+}) (window, $, PubSub)
 
 
 

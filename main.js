@@ -20,7 +20,7 @@ $(function() {
 
     $("#msg2").on('click', function(){
 		edflockGameApi.requestForUserName(function ( d, e ) {
-            $( "#msgs" ).append( "<div><pre>" + e.data + "</pre></div>" );
+            $( "#msgs" ).append( "<div><pre>" + e + "</pre></div>" );
         });
     });
 
