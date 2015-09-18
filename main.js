@@ -1,34 +1,49 @@
 $(function() {
 	edflockGameApi = new EdflockGameApi();
+    totalPoints = 0;
+    function answerCorrect() {
+        var a = 10;
+        totalPoints += a;
+        edflockGameApi.addPoints(a);
+    }
+    var life = 5;
+    function removeLife() {
+        life = life-1;
+        if(life == 0) {
+            edflockGameApi.changeStatusLost({points: totalPoints});
+        }
+        edflockGameApi.updateLife(life);
 
-    /*$("#msg2").on('click', function(){
-		edflockGameApi.requestForUserName()
-			.then(function(data) {
-					$("#msgs").html(data)
-				}, function(err) {
-					console.log(err)
-				}
-			);
-    });*/
-	var a = 10;
-	/*setTimeout(function() {
-		edflockGameApi.requestForUserName(function ( d, e ) {
-	        $( "#msgs" ).append( "<div><pre>" + e.data + "</pre></div>" );
-	    });	
-	}, 1000);*/
-	
-
-    $("#msg2").on('click', function(){
-		edflockGameApi.requestForUserName(function ( d, e ) {
-            $( "#msgs" ).append( "<div><pre>" + e + "</pre></div>" );
+    }
+    function awardBadge() {
+        edflockGameApi.awardBadge({
+            badgeUrl: "/assets/badges/winner.jpg",
+            name: 'winner',
+            id: 1
         });
+
+    }
+
+    edflockGameApi.requestForUser(function(d, e) {
+        var userId = e[0].id;
+        $( "#msgs" ).append( e[0].name );
+
+        $("#addScore").on('click', function() {
+            answerCorrect();
+        });
+
+        $("#changeStatus").on('click', function() {
+            removeLife();
+        });
+
+        $("#awardBadge").on('click', function () {
+            awardBadge();
+        });
+
+        /*$("#changeStatus").on('click', function() {
+            edflockGameApi.changeStatus("completed");
+        })*/
     });
 
-    $("#addScore").on('click', function() {
-    	edflockGameApi.addPoints(a++);
-    });
 
-    $("#changeStatus").on('click', function() {
-    	edflockGameApi.changeStatus("completed");
-    })
 });

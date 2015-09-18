@@ -1,21 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<title>Check GameApi</title>
+    <meta charset="UTF-8">
+    <title>Check GameApi</title>
 </head>
 <body>
+<!-- <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+<link href="/assets/css/app.css" rel="stylesheet">
+<link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="/assets/css/font-awesome.min.css"> -->
 
-	<div id="msgs"></div>
-
-	<a id="msg2">click</a>
-	<a id="addScore">Add Score</a>
-	<a id="changeStatus">Change Status</a>
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="pubsub.js"></script>
-	<script src="edflock_game_api.js"></script>
-	<script src="main.js"></script>
+Hello <span id="msgs"></span>,
+<div>
+    <a id="msg2">click</a>
+    <a id="addScore">Add Score</a>
+    <a id="changeStatus">Lose A life</a>
+    <a id="awardBadge">Award a Badge</a>
+</div>
+<div class="questionArea">
+    <div id="quiz" class="mixed-box" data-featurette="quiz" style="margin-bottom: 0;">
+        <div id="feedback" data-quiz-element="feedback">
+            <div class="box-actions icons-only alert info" style="background-color: #3287E8;">
+                <p class="box-action-text">Choose the correct answer below:</p>
+                <div class="box-action-buttons">
+                    <button class="button secondary">Skip Quiz</button>
+                    <button class="button secondary">Review Content</button>
+                    <button id="ask-question" class=" button secondary">Get Help</button>
+                    <button class=" button primary disabled icon-on-right">Next Question </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="pubsub.js"></script>
+<script src="edflock_game_api.js"></script>
+<script src="main.js"></script>
+<!-- <script src="/assets/js/jquery.min.js"></script>
+<script src="/assets/js/bootstrap.min.js"></script>
+<script src="/assets/js/games/pubsub.js"></script>
+<script src="/assets/js/games/iframe/game_api.js"></script>
+<script src="js/main.js"></script> -->
 </body>
 </html>
