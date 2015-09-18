@@ -17,7 +17,7 @@ $(function() {
     }
     function awardBadge() {
         edflockGameApi.awardBadge({
-            badgeUrl: "/assets/badges/winner.jpg",
+            badgeUrl: "http://images.clipartpanda.com/badge-20clip-20art-KTnXqpETq.png",
             name: 'winner',
             id: 1
         });
