@@ -40,7 +40,7 @@
             console.log('iframe publishing event = '+ messageName);
             PubSub.publish(messageName, data);
 
-            parent.postMessage(dataMain, "*");
+            window.parent.postMessage(dataMain, "*");
         };
 
         this.subscribe = function(options) {
